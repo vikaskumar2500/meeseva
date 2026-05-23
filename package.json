@@ -1,0 +1,19 @@
+{
+  "name": "meeseva-lite-workspace",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:backend": "pnpm --dir Meeseva-lite-backend dev",
+    "dev:frontend": "npm --prefix Meeseva-lite-frontend run dev",
+    "build": "pnpm --dir Meeseva-lite-backend build && npm --prefix Meeseva-lite-frontend run build",
+    "lint": "pnpm --dir Meeseva-lite-backend lint && npm --prefix Meeseva-lite-frontend run lint",
+    "test": "pnpm --dir Meeseva-lite-backend test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "sonner": "^2.0.7"
+  }
+}

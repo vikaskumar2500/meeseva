@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.DS_Store
+coverage
+pnpm-debug.log*
+Dockerfile
+docker-compose.yml
+.git
+.vscode
+README.md

@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  mongo-test:
+    image: mongo:latest
+    container_name: ise_mongo_test
+    ports:
+      - "27018:27017"
+    networks:
+      - ise-test-network
+
+  api-test:
+    build: .
+    container_name: ise_api_test
+    depends_on:
+      - mongo-test
+    environment:
+      - MONGODB_URI=mongodb://mongo-test:27017/ise_backend_test
+      - PORT=5001
+      - JWT_SECRET=supersecrettest
+      - JWT_EXPIRES_IN=1d
+      - NODE_ENV=test
+    command: pnpm test
+    networks:
+      - ise-test-network
+
+networks:
+  ise-test-network:
+    driver: bridge
