@@ -1,28 +1,36 @@
 import { Router } from 'express';
 import { ServiceController } from './service.controller.js';
+import { validate } from '../../common/middlewares/validate.js';
+import {
+  getServicesSchema,
+  searchServicesSchema,
+  getPopularServicesSchema,
+  getServiceByIdSchema,
+} from './service.validation.js';
 
 const router = Router();
 const serviceController = new ServiceController();
 
 // Get all services with filtering
-router.get('/', serviceController.getAllServices);
+router.get('/', validate(getServicesSchema), serviceController.getAllServices);
 
 // Search services
-router.get('/search', serviceController.searchServices);
+router.get('/search', validate(searchServicesSchema), serviceController.searchServices);
 
 // Get popular services
-router.get('/popular', serviceController.getPopularServices);
+router.get('/popular', validate(getPopularServicesSchema), serviceController.getPopularServices);
 
-// Get all categories
+// Direct filter metadata routes
+router.get('/categories', serviceController.getCategories);
+router.get('/departments', serviceController.getDepartments);
+router.get('/tags', serviceController.getTags);
+
+// Backward-compatible nested filter metadata routes
 router.get('/filters/categories', serviceController.getCategories);
-
-// Get all departments
 router.get('/filters/departments', serviceController.getDepartments);
-
-// Get all tags
 router.get('/filters/tags', serviceController.getTags);
 
-// Get service by ID (must be last due to param matching)
-router.get('/:id', serviceController.getServiceById);
+// Get service by ID (validated numeric ID)
+router.get('/:id', validate(getServiceByIdSchema), serviceController.getServiceById);
 
 export { router as serviceRoutes };

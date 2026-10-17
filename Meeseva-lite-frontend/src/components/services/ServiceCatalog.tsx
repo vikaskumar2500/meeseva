@@ -38,15 +38,26 @@ export const ServiceCatalog: React.FC<ServiceCatalogProps> = ({
     setLoading(true);
     setError(null);
     try {
-      const [servicesRes, categoriesRes] = await Promise.all([
-        api.getServices({
-          category: selectedCategory !== 'all' ? selectedCategory : undefined,
-          limit: 30,
-        }),
-        api.getCategories(),
-      ]);
+      const servicesRes = await api.getServices({
+        category: selectedCategory !== 'all' ? selectedCategory : undefined,
+        limit: 30,
+      });
       setServices(servicesRes.data || []);
-      setCategories(categoriesRes.data || []);
+
+      // Non-blocking categories fetch with fallback to loaded services
+      api.getCategories()
+        .then((res) => {
+          if (res.data && res.data.length > 0) {
+            setCategories(res.data);
+          } else {
+            const distinct = Array.from(new Set(servicesRes.data?.map((s) => s.category).filter(Boolean)));
+            if (distinct.length) setCategories(distinct);
+          }
+        })
+        .catch(() => {
+          const distinct = Array.from(new Set(servicesRes.data?.map((s) => s.category).filter(Boolean)));
+          if (distinct.length) setCategories(distinct);
+        });
     } catch (err: any) {
       setError(err.message || 'Failed to load government services');
     } finally {

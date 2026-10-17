@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import { AppError } from '../../common/errors/app-error.js';
 import { GovServiceCatalogService } from './service.service.js';
 
 export class ServiceController {
@@ -56,6 +57,9 @@ export class ServiceController {
   getServiceById: RequestHandler = async (request, response, next) => {
     try {
       const id = parseInt(String(request.params.id), 10);
+      if (Number.isNaN(id)) {
+        throw new AppError(400, 'Invalid service ID: must be a valid number');
+      }
       const service = await this.service.getServiceById(id);
       response.json(service);
     } catch (error) {

@@ -54,6 +54,9 @@ export class GovServiceCatalogService {
   }
 
   async getServiceById(id: number) {
+    if (typeof id !== 'number' || Number.isNaN(id)) {
+      throw new AppError(400, 'Invalid service ID: must be a valid number');
+    }
     const service = await this.serviceRepository.findById(id);
     if (!service) {
       throw new AppError(404, 'Service not found');

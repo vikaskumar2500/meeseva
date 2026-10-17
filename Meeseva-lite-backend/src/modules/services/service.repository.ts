@@ -24,11 +24,34 @@ export class ServiceRepository implements IServiceRepository {
   }
 
   async search(query: string, skip: number = 0, limit: number = 10) {
-    return ServiceModel.find(
-      { $text: { $search: query } },
-      { score: { $meta: 'textScore' } }
-    )
-      .sort({ score: { $meta: 'textScore' } })
+    try {
+      const textResults = await ServiceModel.find(
+        { $text: { $search: query } },
+        { score: { $meta: 'textScore' } }
+      )
+        .sort({ score: { $meta: 'textScore' } })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      if (textResults && textResults.length > 0) {
+        return textResults;
+      }
+    } catch {
+      // Fall back to regex search if text index is missing or query syntax error
+    }
+
+    const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escaped, 'i');
+    return ServiceModel.find({
+      $or: [
+        { name: regex },
+        { description: regex },
+        { category: regex },
+        { department: regex },
+        { tags: regex },
+      ],
+    })
       .skip(skip)
       .limit(limit)
       .lean();

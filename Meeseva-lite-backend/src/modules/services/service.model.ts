@@ -49,4 +49,6 @@ const serviceSchema = new Schema<Service>(
   { timestamps: true }
 );
 
+serviceSchema.index({ name: 'text', description: 'text', tags: 'text', category: 'text', department: 'text' });
+
 export const ServiceModel = model<Service>('Service', serviceSchema);
