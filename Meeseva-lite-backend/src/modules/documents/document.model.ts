@@ -1,6 +1,12 @@
 import { Schema, model, type HydratedDocument, type Types } from 'mongoose';
 
-export type DocumentType = 'aadhaar' | 'pan' | 'passport' | 'license' | 'certificate' | 'other';
+export type DocumentType =
+  | 'aadhaar'
+  | 'pan'
+  | 'passport'
+  | 'license'
+  | 'certificate'
+  | 'other';
 export type VerificationStatus = 'pending' | 'verified' | 'rejected';
 
 export interface Document {
@@ -23,7 +29,12 @@ export type DocumentDocument = HydratedDocument<Document>;
 
 const documentSchema = new Schema<Document>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
     name: { type: String, required: true, trim: true },
     type: {
       type: String,

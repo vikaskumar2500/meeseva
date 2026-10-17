@@ -18,6 +18,7 @@ This is a two-step registration process with OTP verification.
 - **URL**: `/auth/register/initiate`
 - **Description**: Starts the registration process and sends OTP to user's phone.
 - **Body**:
+
   ```json
   {
     "fullName": "John Doe",
@@ -26,14 +27,13 @@ This is a two-step registration process with OTP verification.
   }
   ```
 
-  ---
+  ***
 
   ## Services
 
   Browse and search government services without authentication.
 
   ### 1. Get all services
-
   - **Method**: `GET`
   - **URL**: `/services`
   - **Query Parameters**:
@@ -73,7 +73,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 2. Search services
-
   - **Method**: `GET`
   - **URL**: `/services/search`
   - **Query Parameters**:
@@ -84,7 +83,6 @@ This is a two-step registration process with OTP verification.
   - **Response**: Same as get all services
 
   ### 3. Get popular services
-
   - **Method**: `GET`
   - **URL**: `/services/popular`
   - **Query Parameters**:
@@ -99,7 +97,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 4. Get service categories
-
   - **Method**: `GET`
   - **URL**: `/services/filters/categories`
   - **Response**:
@@ -120,7 +117,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 5. Get service departments
-
   - **Method**: `GET`
   - **URL**: `/services/filters/departments`
   - **Response**:
@@ -137,7 +133,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 6. Get service tags
-
   - **Method**: `GET`
   - **URL**: `/services/filters/tags`
   - **Response**:
@@ -155,20 +150,18 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 7. Get single service
-
   - **Method**: `GET`
   - **URL**: `/services/:id`
   - **Example**: `/services/1`
   - **Response**: Single service object
 
-  ---
+  ***
 
   ## Documents
 
   These endpoints require authentication. Manage user documents with OCR support.
 
   ### 1. Upload document
-
   - **Method**: `POST`
   - **URL**: `/documents`
   - **Headers**: `Authorization: Bearer <token>`
@@ -198,7 +191,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 2. Get user documents
-
   - **Method**: `GET`
   - **URL**: `/documents`
   - **Headers**: `Authorization: Bearer <token>`
@@ -209,21 +201,18 @@ This is a two-step registration process with OTP verification.
   - **Response**: Paginated documents with pagination info
 
   ### 3. Get single document
-
   - **Method**: `GET`
   - **URL**: `/documents/:id`
   - **Headers**: `Authorization: Bearer <token>`
   - **Response**: Single document object
 
   ### 4. Delete document
-
   - **Method**: `DELETE`
   - **URL**: `/documents/:id`
   - **Headers**: `Authorization: Bearer <token>`
   - **Response**: `{ "message": "Document deleted successfully" }`
 
   ### 5. Update extracted data (OCR)
-
   - **Method**: `PATCH`
   - **URL**: `/documents/:id/extracted-data`
   - **Headers**: `Authorization: Bearer <token>`
@@ -240,7 +229,6 @@ This is a two-step registration process with OTP verification.
   - **Response**: Updated document object
 
   ### 6. Update verification status (Admin)
-
   - **Method**: `PATCH`
   - **URL**: `/documents/:id/verification`
   - **Headers**: `Authorization: Bearer <token>`
@@ -253,21 +241,19 @@ This is a two-step registration process with OTP verification.
     ```
   - **Response**: Updated document object
 
-  ---
+  ***
 
   ## User Profile
 
   These endpoints require authentication.
 
   ### 1. Get profile
-
   - **Method**: `GET`
   - **URL**: `/users/me`
   - **Headers**: `Authorization: Bearer <token>`
   - **Response**: User object with all details
 
   ### 2. Update profile
-
   - **Method**: `PATCH`
   - **URL**: `/users/me`
   - **Headers**: `Authorization: Bearer <token>`
@@ -287,7 +273,6 @@ This is a two-step registration process with OTP verification.
   - **Response**: Updated user object
 
   ### 3. Change password
-
   - **Method**: `POST`
   - **URL**: `/users/change-password`
   - **Headers**: `Authorization: Bearer <token>`
@@ -301,7 +286,6 @@ This is a two-step registration process with OTP verification.
   - **Response**: `{ "message": "Password changed successfully" }`
 
   ### 4. Get saved services
-
   - **Method**: `GET`
   - **URL**: `/users/saved-services`
   - **Headers**: `Authorization: Bearer <token>`
@@ -313,7 +297,6 @@ This is a two-step registration process with OTP verification.
     ```
 
   ### 5. Add saved service
-
   - **Method**: `POST`
   - **URL**: `/users/saved-services`
   - **Headers**: `Authorization: Bearer <token>`
@@ -326,14 +309,12 @@ This is a two-step registration process with OTP verification.
   - **Response**: Updated user object
 
   ### 6. Remove saved service
-
   - **Method**: `DELETE`
   - **URL**: `/users/saved-services/:serviceId`
   - **Headers**: `Authorization: Bearer <token>`
   - **Response**: Updated user object
 
   ### 7. Add trusted document
-
   - **Method**: `POST`
   - **URL**: `/users/trusted-documents`
   - **Headers**: `Authorization: Bearer <token>`
@@ -348,7 +329,6 @@ This is a two-step registration process with OTP verification.
   - **Response**: Updated user object
 
   ### 8. Get application statistics
-
   - **Method**: `GET`
   - **URL**: `/users/stats`
   - **Headers**: `Authorization: Bearer <token>`
@@ -361,6 +341,7 @@ This is a two-step registration process with OTP verification.
       "totalPending": 1
     }
     ```
+
 - **Response (Success 200)**:
   ```json
   {
@@ -567,8 +548,8 @@ This endpoint requires authentication. You must include the JWT in the `Authoriz
   ```json
   {
     "user": {
-        "role": "user",
-        "_id": "60a5...",
+      "role": "user",
+      "_id": "60a5...",
       "desiredLoginId": "9999999999",
       "mobileNumber": "8888888888",
       "fullName": "John Doe",
@@ -577,9 +558,9 @@ This endpoint requires authentication. You must include the JWT in the `Authoriz
       "state": "Karnataka",
       "district": "Bengaluru",
       "pinCode": "560001",
-        "email": "john.doe@example.com",
-        "createdAt": "2026-05-14T...",
-        "updatedAt": "2026-05-14T..."
+      "email": "john.doe@example.com",
+      "createdAt": "2026-05-14T...",
+      "updatedAt": "2026-05-14T..."
     }
   }
   ```
@@ -611,18 +592,18 @@ These endpoints require authentication.
   ```json
   {
     "application": {
-        "userId": "60a5...",
-        "applicationType": "leave_request",
-        "title": "Vacation Request",
-        "status": "draft",
-        "payload": {
-            "startDate": "2026-06-01",
-            "endDate": "2026-06-05",
-            "reason": "Family vacation"
-        },
-        "_id": "60a5...",
-        "createdAt": "2026-05-14T...",
-        "updatedAt": "2026-05-14T..."
+      "userId": "60a5...",
+      "applicationType": "leave_request",
+      "title": "Vacation Request",
+      "status": "draft",
+      "payload": {
+        "startDate": "2026-06-01",
+        "endDate": "2026-06-05",
+        "reason": "Family vacation"
+      },
+      "_id": "60a5...",
+      "createdAt": "2026-05-14T...",
+      "updatedAt": "2026-05-14T..."
     }
   }
   ```
@@ -643,9 +624,9 @@ These endpoints require authentication.
         "title": "Vacation Request",
         "status": "draft",
         "payload": {
-            "startDate": "2026-06-01",
-            "endDate": "2026-06-05",
-            "reason": "Family vacation"
+          "startDate": "2026-06-01",
+          "endDate": "2026-06-05",
+          "reason": "Family vacation"
         },
         "createdAt": "2026-05-14T...",
         "updatedAt": "2026-05-14T..."
@@ -663,18 +644,18 @@ These endpoints require authentication.
   ```json
   {
     "application": {
-        "_id": "60a5...",
-        "userId": "60a5...",
-        "applicationType": "leave_request",
-        "title": "Vacation Request",
-        "status": "draft",
-        "payload": {
-            "startDate": "2026-06-01",
-            "endDate": "2026-06-05",
-            "reason": "Family vacation"
-        },
-        "createdAt": "2026-05-14T...",
-        "updatedAt": "2026-05-14T..."
+      "_id": "60a5...",
+      "userId": "60a5...",
+      "applicationType": "leave_request",
+      "title": "Vacation Request",
+      "status": "draft",
+      "payload": {
+        "startDate": "2026-06-01",
+        "endDate": "2026-06-05",
+        "reason": "Family vacation"
+      },
+      "createdAt": "2026-05-14T...",
+      "updatedAt": "2026-05-14T..."
     }
   }
   ```
@@ -699,18 +680,18 @@ These endpoints require authentication.
   ```json
   {
     "application": {
-        "_id": "60a5...",
-        "userId": "60a5...",
-        "applicationType": "leave_request",
-        "title": "Vacation Request",
-        "status": "submitted",
-        "payload": {
-            "startDate": "2026-06-01",
-            "endDate": "2026-06-07",
-            "reason": "Extended family vacation"
-        },
-        "createdAt": "2026-05-14T...",
-        "updatedAt": "2026-05-14T..."
+      "_id": "60a5...",
+      "userId": "60a5...",
+      "applicationType": "leave_request",
+      "title": "Vacation Request",
+      "status": "submitted",
+      "payload": {
+        "startDate": "2026-06-01",
+        "endDate": "2026-06-07",
+        "reason": "Extended family vacation"
+      },
+      "createdAt": "2026-05-14T...",
+      "updatedAt": "2026-05-14T..."
     }
   }
   ```
@@ -738,13 +719,13 @@ These endpoints require authentication.
   ```json
   {
     "trackingEntry": {
-        "applicationId": "60a5...",
-        "status": "in_review",
-        "note": "Forwarded to manager for approval.",
-        "updatedBy": "60a5...",
-        "_id": "60a5...",
-        "createdAt": "2026-05-14T...",
-        "updatedAt": "2026-05-14T..."
+      "applicationId": "60a5...",
+      "status": "in_review",
+      "note": "Forwarded to manager for approval.",
+      "updatedBy": "60a5...",
+      "_id": "60a5...",
+      "createdAt": "2026-05-14T...",
+      "updatedAt": "2026-05-14T..."
     }
   }
   ```

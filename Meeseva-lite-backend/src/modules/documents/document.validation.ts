@@ -3,7 +3,14 @@ import { z } from 'zod';
 export const uploadDocumentSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Document name is required'),
-    type: z.enum(['aadhaar', 'pan', 'passport', 'license', 'certificate', 'other']),
+    type: z.enum([
+      'aadhaar',
+      'pan',
+      'passport',
+      'license',
+      'certificate',
+      'other',
+    ]),
     issuer: z.string().min(1, 'Issuer is required'),
     issueDate: z.string().datetime().optional(),
     expiryDate: z.string().datetime().optional(),

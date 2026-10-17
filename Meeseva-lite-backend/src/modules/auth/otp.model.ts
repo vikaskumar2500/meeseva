@@ -17,7 +17,11 @@ const otpSchema = new Schema<OTP>(
     email: { type: String, lowercase: true },
     phone: { type: String },
     code: { type: String, required: true },
-    purpose: { type: String, enum: ['registration', 'password_reset'], required: true },
+    purpose: {
+      type: String,
+      enum: ['registration', 'password_reset'],
+      required: true,
+    },
     expiresAt: { type: Date, required: true, index: { expireAfterSeconds: 0 } },
     attempts: { type: Number, default: 0 },
     verified: { type: Boolean, default: false },

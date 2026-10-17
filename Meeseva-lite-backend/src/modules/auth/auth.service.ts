@@ -2,15 +2,31 @@ import bcrypt from 'bcryptjs';
 import { AppError } from '../../common/errors/app-error.js';
 import { signAccessToken } from '../../common/utils/jwt.js';
 import { env } from '../../config/env.js';
+import type { IUserRepository } from '../../domain/interfaces/user.repository.interface.js';
+import type { IOtpRepository } from '../../domain/interfaces/otp.repository.interface.js';
+import type { INotificationService } from '../../domain/interfaces/notification.provider.interface.js';
 import { UserRepository } from '../users/user.repository.js';
 import { OTPRepository } from './otp.repository.js';
-import { OtpDeliveryService } from './otp-delivery.service.js';
+import { NotificationService } from '../../infrastructure/notifications/notification.service.js';
+import {
+  TwilioSmsProvider,
+  MockSmsProvider,
+} from '../../infrastructure/notifications/sms/sms.providers.js';
+import {
+  SendGridEmailProvider,
+  MockEmailProvider,
+} from '../../infrastructure/notifications/email/email.providers.js';
+
+const defaultNotificationService = new NotificationService(
+  [new TwilioSmsProvider(), new MockSmsProvider()],
+  [new SendGridEmailProvider(), new MockEmailProvider()]
+);
 
 export class AuthService {
   constructor(
-    private readonly userRepository = new UserRepository(),
-    private readonly otpRepository = new OTPRepository(),
-    private readonly otpDeliveryService = new OtpDeliveryService()
+    private readonly userRepository: IUserRepository = new UserRepository(),
+    private readonly otpRepository: IOtpRepository = new OTPRepository(),
+    private readonly notificationService: INotificationService = defaultNotificationService
   ) {}
 
   /**
@@ -28,7 +44,6 @@ export class AuthService {
     email: string;
     phone: string;
   }) {
-    // Check if user already exists
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
       throw new AppError(409, 'Email already registered');
@@ -39,7 +54,6 @@ export class AuthService {
       throw new AppError(409, 'Phone number already registered');
     }
 
-    // Generate and send OTP
     const otp = this.generateOTP();
     await this.otpRepository.create({
       email: input.email,
@@ -48,7 +62,7 @@ export class AuthService {
       purpose: 'registration',
     });
 
-    await this.otpDeliveryService.sendOtp({
+    await this.notificationService.sendOtp({
       phone: input.phone,
       email: input.email,
       otp,
@@ -58,7 +72,7 @@ export class AuthService {
     return {
       message: 'OTP sent successfully',
       phone: input.phone,
-      expiresIn: 600, // 10 minutes
+      expiresIn: 600,
       ...(env.NODE_ENV !== 'production' ? { devOtp: otp } : {}),
     };
   }
@@ -72,8 +86,8 @@ export class AuthService {
     otp: string;
     fullName: string;
     password: string;
+    role?: 'citizen' | 'officer' | 'admin';
   }) {
-    // Verify OTP
     const otpRecord = await this.otpRepository.verify({
       email: input.email,
       phone: input.phone,
@@ -85,23 +99,24 @@ export class AuthService {
       throw new AppError(400, 'Invalid or expired OTP');
     }
 
-    // Create user
     const passwordHash = await bcrypt.hash(input.password, 12);
     const user = await this.userRepository.create({
       fullName: input.fullName,
-      email: input.email,
+      email: input.email.toLowerCase(),
       phone: input.phone,
       passwordHash,
-      role: 'citizen',
+      role: input.role || 'citizen',
       otpVerified: true,
     });
 
-    // Clean up OTP
     await this.otpRepository.deleteByEmail(input.email, 'registration');
     await this.otpRepository.deleteByPhone(input.phone, 'registration');
 
-    // Generate token
-    const token = signAccessToken({ userId: user._id.toString(), email: user.email, role: user.role });
+    const token = signAccessToken({
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
 
     return { user, token };
   }
@@ -110,7 +125,6 @@ export class AuthService {
    * Login with email/phone and password
    */
   async login(input: { loginId: string; password: string }) {
-    // Find user by email or phone
     let user = await this.userRepository.findByEmail(input.loginId);
     if (!user) {
       user = await this.userRepository.findByPhone(input.loginId);
@@ -120,14 +134,19 @@ export class AuthService {
       throw new AppError(401, 'Invalid credentials');
     }
 
-    // Verify password
-    const isPasswordValid = await bcrypt.compare(input.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      input.password,
+      user.passwordHash
+    );
     if (!isPasswordValid) {
       throw new AppError(401, 'Invalid credentials');
     }
 
-    // Generate token
-    const token = signAccessToken({ userId: user._id.toString(), email: user.email, role: user.role });
+    const token = signAccessToken({
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
 
     return { user, token };
   }
@@ -136,7 +155,6 @@ export class AuthService {
    * Initiate forgot password - Send OTP
    */
   async initiateForgotPassword(input: { loginId: string }) {
-    // Find user by email or phone
     let user = await this.userRepository.findByEmail(input.loginId);
     let phone = user?.phone;
 
@@ -149,7 +167,6 @@ export class AuthService {
       throw new AppError(404, 'User not found');
     }
 
-    // Generate and send OTP
     const otp = this.generateOTP();
     await this.otpRepository.create({
       email: user.email,
@@ -158,7 +175,7 @@ export class AuthService {
       purpose: 'password_reset',
     });
 
-    await this.otpDeliveryService.sendOtp({
+    await this.notificationService.sendOtp({
       phone,
       email: user.email,
       otp,
@@ -168,7 +185,7 @@ export class AuthService {
     return {
       message: 'OTP sent successfully',
       phone: phone,
-      expiresIn: 600, // 10 minutes
+      expiresIn: 600,
       ...(env.NODE_ENV !== 'production' ? { devOtp: otp } : {}),
     };
   }
@@ -181,7 +198,6 @@ export class AuthService {
     otp: string;
     newPassword: string;
   }) {
-    // Find user
     let user = await this.userRepository.findByEmail(input.loginId);
     if (!user) {
       user = await this.userRepository.findByPhone(input.loginId);
@@ -191,7 +207,6 @@ export class AuthService {
       throw new AppError(404, 'User not found');
     }
 
-    // Verify OTP
     const otpRecord = await this.otpRepository.verify({
       email: user.email,
       phone: user.phone,
@@ -203,11 +218,9 @@ export class AuthService {
       throw new AppError(400, 'Invalid or expired OTP');
     }
 
-    // Update password
     const passwordHash = await bcrypt.hash(input.newPassword, 12);
     await this.userRepository.updatePassword(user._id.toString(), passwordHash);
 
-    // Clean up OTP
     await this.otpRepository.deleteByEmail(user.email, 'password_reset');
     await this.otpRepository.deleteByPhone(user.phone, 'password_reset');
 
@@ -215,7 +228,7 @@ export class AuthService {
   }
 
   /**
-   * Register with full details (old flow - backward compatibility)
+   * Register with full details (backward compatibility)
    */
   async register(input: {
     desiredLoginId: string;
@@ -229,9 +242,9 @@ export class AuthService {
     email: string;
     password: string;
     confirmPassword: string;
+    role?: 'citizen' | 'officer' | 'admin';
   }) {
     const existingUser = await this.userRepository.findByEmail(input.email);
-
     if (existingUser) {
       throw new AppError(409, 'Email already registered');
     }
@@ -246,14 +259,18 @@ export class AuthService {
       state: input.state,
       district: input.district,
       pinCode: input.pinCode,
-      email: input.email,
+      email: input.email.toLowerCase(),
       phone: input.mobileNumber,
       passwordHash,
-      role: 'citizen',
+      role: input.role || 'citizen',
       otpVerified: true,
     });
 
-    const token = signAccessToken({ userId: user._id.toString(), email: user.email, role: user.role });
+    const token = signAccessToken({
+      userId: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
 
     return { user, token };
   }

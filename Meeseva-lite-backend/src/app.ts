@@ -20,7 +20,10 @@ export const createApp = () => {
   app.use(helmet());
   app.use(cors());
   app.use(express.json({ limit: '1mb' }));
-  app.use('/uploads', express.static(path.resolve(process.cwd(), env.UPLOAD_DIR)));
+  app.use(
+    '/uploads',
+    express.static(path.resolve(process.cwd(), env.UPLOAD_DIR))
+  );
   app.use(rateLimit({ windowMs: 15 * 60 * 1000, limit: 200 }));
 
   app.get('/health', (_request, response) => {
@@ -31,9 +34,9 @@ export const createApp = () => {
   app.use('/api/v1/users', userRoutes);
   app.use('/api/v1/applications', applicationRoutes);
   app.use('/api/v1/tracking', trackingRoutes);
-    app.use('/api/v1/services', serviceRoutes);
-    app.use('/api/v1/documents', documentRoutes);
-    app.use('/api/v1/speech', speechRoutes);
+  app.use('/api/v1/services', serviceRoutes);
+  app.use('/api/v1/documents', documentRoutes);
+  app.use('/api/v1/speech', speechRoutes);
 
   app.use(notFound);
   app.use(errorHandler);

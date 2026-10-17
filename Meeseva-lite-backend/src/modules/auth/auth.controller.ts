@@ -37,7 +37,9 @@ export class AuthController {
   // Step 1: Forgot password - send OTP
   initiateForgotPassword: RequestHandler = async (request, response, next) => {
     try {
-      const result = await this.authService.initiateForgotPassword(request.body);
+      const result = await this.authService.initiateForgotPassword(
+        request.body
+      );
       response.status(200).json(result);
     } catch (error) {
       next(error);
@@ -47,7 +49,9 @@ export class AuthController {
   // Step 2: Verify OTP and reset password
   verifyForgotPassword: RequestHandler = async (request, response, next) => {
     try {
-      const result = await this.authService.verifyForgotPasswordOtp(request.body);
+      const result = await this.authService.verifyForgotPasswordOtp(
+        request.body
+      );
       response.json(result);
     } catch (error) {
       next(error);

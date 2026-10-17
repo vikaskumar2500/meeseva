@@ -19,22 +19,41 @@ export class OtpDeliveryService {
 
     const deliveryResults = await Promise.allSettled([
       this.sendSms(input.phone, message),
-      input.email ? this.sendEmail(input.email, input.otp, input.purpose) : Promise.resolve(false),
+      input.email
+        ? this.sendEmail(input.email, input.otp, input.purpose)
+        : Promise.resolve(false),
     ]);
-    const delivered = deliveryResults.some((result) => result.status === 'fulfilled' && result.value);
+    const delivered = deliveryResults.some(
+      (result) => result.status === 'fulfilled' && result.value
+    );
 
     if (!delivered) {
       if (env.NODE_ENV === 'production') {
         const errors = deliveryResults
-          .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
-          .map((result) => (result.reason instanceof Error ? result.reason.message : String(result.reason)));
+          .filter(
+            (result): result is PromiseRejectedResult =>
+              result.status === 'rejected'
+          )
+          .map((result) =>
+            result.reason instanceof Error
+              ? result.reason.message
+              : String(result.reason)
+          );
 
-        throw new Error(errors.length ? `OTP delivery failed: ${errors.join('; ')}` : 'OTP delivery provider is not configured');
+        throw new Error(
+          errors.length
+            ? `OTP delivery failed: ${errors.join('; ')}`
+            : 'OTP delivery provider is not configured'
+        );
       }
 
       deliveryResults.forEach((result) => {
         if (result.status === 'rejected') {
-          console.warn(result.reason instanceof Error ? result.reason.message : result.reason);
+          console.warn(
+            result.reason instanceof Error
+              ? result.reason.message
+              : result.reason
+          );
         }
       });
       console.warn(`[OTP][development fallback] ${input.phone}: ${input.otp}`);
@@ -42,7 +61,10 @@ export class OtpDeliveryService {
   }
 
   private buildMessage(otp: string, purpose: OtpPurpose): string {
-    const action = purpose === 'password_reset' ? 'reset your MeeSeva Lite password' : 'verify your MeeSeva Lite account';
+    const action =
+      purpose === 'password_reset'
+        ? 'reset your MeeSeva Lite password'
+        : 'verify your MeeSeva Lite account';
     return `Your OTP to ${action} is ${otp}. It is valid for 10 minutes.`;
   }
 
@@ -54,21 +76,26 @@ export class OtpDeliveryService {
     }
 
     if (!this.isE164Phone(TWILIO_FROM_PHONE)) {
-      throw new Error('TWILIO_FROM_PHONE must be an E.164 Twilio SMS-capable sender, for example +15551234567');
+      throw new Error(
+        'TWILIO_FROM_PHONE must be an E.164 Twilio SMS-capable sender, for example +15551234567'
+      );
     }
 
-    const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64')}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        From: TWILIO_FROM_PHONE,
-        To: this.normalizePhone(phone),
-        Body: message,
-      }),
-    });
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64')}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          From: TWILIO_FROM_PHONE,
+          To: this.normalizePhone(phone),
+          Body: message,
+        }),
+      }
+    );
 
     if (!response.ok) {
       const body = await response.text();
@@ -78,14 +105,21 @@ export class OtpDeliveryService {
     return true;
   }
 
-  private async sendEmail(email: string, otp: string, purpose: OtpPurpose): Promise<boolean> {
+  private async sendEmail(
+    email: string,
+    otp: string,
+    purpose: OtpPurpose
+  ): Promise<boolean> {
     const { SENDGRID_API_KEY, OTP_EMAIL_FROM } = env;
 
     if (!SENDGRID_API_KEY || !OTP_EMAIL_FROM) {
       return false;
     }
 
-    const subject = purpose === 'password_reset' ? 'Reset your MeeSeva Lite password' : 'Verify your MeeSeva Lite account';
+    const subject =
+      purpose === 'password_reset'
+        ? 'Reset your MeeSeva Lite password'
+        : 'Verify your MeeSeva Lite account';
     const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
@@ -96,7 +130,12 @@ export class OtpDeliveryService {
         personalizations: [{ to: [{ email }] }],
         from: { email: OTP_EMAIL_FROM },
         subject,
-        content: [{ type: 'text/plain', value: `Your OTP is ${otp}. It is valid for 10 minutes.` }],
+        content: [
+          {
+            type: 'text/plain',
+            value: `Your OTP is ${otp}. It is valid for 10 minutes.`,
+          },
+        ],
       }),
     });
 

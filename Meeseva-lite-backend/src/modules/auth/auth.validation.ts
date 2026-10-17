@@ -46,20 +46,22 @@ export const verifyForgotPasswordSchema = z.object({
 
 // Register (old schema - for backward compatibility)
 export const registerSchema = z.object({
-  body: z.object({
-    desiredLoginId: z.string().min(1),
-    mobileNumber: z.string().min(1),
-    fullName: z.string().min(1),
-    address: z.string().min(1),
-    country: z.string().min(1),
-    state: z.string().min(1),
-    district: z.string().min(1),
-    pinCode: z.string().min(1),
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
-  }).refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  }),
+  body: z
+    .object({
+      desiredLoginId: z.string().min(1),
+      mobileNumber: z.string().min(1),
+      fullName: z.string().min(1),
+      address: z.string().min(1),
+      country: z.string().min(1),
+      state: z.string().min(1),
+      district: z.string().min(1),
+      pinCode: z.string().min(1),
+      email: z.string().email(),
+      password: z.string().min(8),
+      confirmPassword: z.string().min(8),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: 'Passwords do not match',
+      path: ['confirmPassword'],
+    }),
 });

@@ -60,8 +60,14 @@ describe('Application API', () => {
       });
 
     expect(response.status).toBe(201);
-    expect(response.body.application).toHaveProperty('title', 'My First Application');
-    expect(response.body.application).toHaveProperty('userId', userId.toString());
+    expect(response.body.application).toHaveProperty(
+      'title',
+      'My First Application'
+    );
+    expect(response.body.application).toHaveProperty(
+      'userId',
+      userId.toString()
+    );
   });
 
   it('should get all applications for the logged-in user', async () => {

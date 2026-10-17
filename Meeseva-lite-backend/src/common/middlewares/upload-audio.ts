@@ -12,7 +12,10 @@ const loadMulter = () => {
   try {
     return require('multer') as any;
   } catch {
-    throw new AppError(500, 'File upload dependency is missing. Run `pnpm add multer` and restart the server.');
+    throw new AppError(
+      500,
+      'File upload dependency is missing. Run `pnpm add multer` and restart the server.'
+    );
   }
 };
 
@@ -29,7 +32,7 @@ const getUploadMiddleware = (): RequestHandler => {
     fileFilter: (
       _request: unknown,
       file: { mimetype: string },
-      callback: (error: Error | null, acceptFile?: boolean) => void,
+      callback: (error: Error | null, acceptFile?: boolean) => void
     ) => {
       if (!allowedMimeTypes.has(file.mimetype)) {
         callback(new AppError(400, 'Only WAV audio files are allowed'));
@@ -52,7 +55,12 @@ export const uploadSingleAudio: RequestHandler = (request, response, next) => {
 
     const multerError = error as { code?: string; message?: string };
     if (multerError.code === 'LIMIT_FILE_SIZE') {
-      next(new AppError(400, `Audio is too large. Maximum allowed size is ${env.MAX_AUDIO_BYTES} bytes`));
+      next(
+        new AppError(
+          400,
+          `Audio is too large. Maximum allowed size is ${env.MAX_AUDIO_BYTES} bytes`
+        )
+      );
       return;
     }
 

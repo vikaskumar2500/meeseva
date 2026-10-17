@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import {
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from 'vitest';
 import supertest from 'supertest';
 import mongoose from 'mongoose';
 import { createApp } from '../../app.js';
@@ -117,11 +125,13 @@ describe('Auth API', () => {
 
   describe('OTP-based Registration Flow', () => {
     it('should initiate registration and send OTP', async () => {
-      const response = await request.post('/api/v1/auth/register/initiate').send({
-        fullName: 'John Doe',
-        email: 'john@example.com',
-        phone: '9876543210',
-      });
+      const response = await request
+        .post('/api/v1/auth/register/initiate')
+        .send({
+          fullName: 'John Doe',
+          email: 'john@example.com',
+          phone: '9876543210',
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('OTP sent successfully');
@@ -151,11 +161,13 @@ describe('Auth API', () => {
       });
 
       // Try to initiate registration with same email
-      const response = await request.post('/api/v1/auth/register/initiate').send({
-        fullName: 'John Doe',
-        email: 'test@example.com',
-        phone: '9876543210',
-      });
+      const response = await request
+        .post('/api/v1/auth/register/initiate')
+        .send({
+          fullName: 'John Doe',
+          email: 'test@example.com',
+          phone: '9876543210',
+        });
 
       expect(response.status).toBe(409);
       expect(response.body.message).toBe('Email already registered');
@@ -174,13 +186,15 @@ describe('Auth API', () => {
       const otp = otpRecord.code;
 
       // Verify OTP and complete registration
-      const response = await request.post('/api/v1/auth/register/verify-otp').send({
-        email: 'john@example.com',
-        phone: '9876543210',
-        otp: otp,
-        fullName: 'John Doe',
-        password: 'SecurePass123',
-      });
+      const response = await request
+        .post('/api/v1/auth/register/verify-otp')
+        .send({
+          email: 'john@example.com',
+          phone: '9876543210',
+          otp: otp,
+          fullName: 'John Doe',
+          password: 'SecurePass123',
+        });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
@@ -207,13 +221,15 @@ describe('Auth API', () => {
       });
 
       // Try to verify with wrong OTP
-      const response = await request.post('/api/v1/auth/register/verify-otp').send({
-        email: 'john@example.com',
-        phone: '9876543210',
-        otp: '000000',
-        fullName: 'John Doe',
-        password: 'SecurePass123',
-      });
+      const response = await request
+        .post('/api/v1/auth/register/verify-otp')
+        .send({
+          email: 'john@example.com',
+          phone: '9876543210',
+          otp: '000000',
+          fullName: 'John Doe',
+          password: 'SecurePass123',
+        });
 
       expect(response.status).toBe(400);
       expect(response.body.message).toBe('Invalid or expired OTP');
@@ -239,9 +255,11 @@ describe('Auth API', () => {
     });
 
     it('should initiate forgot password and send OTP', async () => {
-      const response = await request.post('/api/v1/auth/forgot-password/initiate').send({
-        loginId: 'test@example.com',
-      });
+      const response = await request
+        .post('/api/v1/auth/forgot-password/initiate')
+        .send({
+          loginId: 'test@example.com',
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('OTP sent successfully');
@@ -264,11 +282,13 @@ describe('Auth API', () => {
       const otp = otpRecord.code;
 
       // Reset password
-      const response = await request.post('/api/v1/auth/forgot-password/verify-otp').send({
-        loginId: 'test@example.com',
-        otp: otp,
-        newPassword: 'newpassword123',
-      });
+      const response = await request
+        .post('/api/v1/auth/forgot-password/verify-otp')
+        .send({
+          loginId: 'test@example.com',
+          otp: otp,
+          newPassword: 'newpassword123',
+        });
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe('Password reset successfully');
@@ -285,9 +305,11 @@ describe('Auth API', () => {
 
     it('should allow login with phone after forgot password', async () => {
       // Initiate forgot password with phone
-      const response = await request.post('/api/v1/auth/forgot-password/initiate').send({
-        loginId: '8888888888',
-      });
+      const response = await request
+        .post('/api/v1/auth/forgot-password/initiate')
+        .send({
+          loginId: '8888888888',
+        });
 
       expect(response.status).toBe(200);
 
@@ -296,11 +318,13 @@ describe('Auth API', () => {
       const otp = otpRecord.code;
 
       // Reset password
-      const resetResponse = await request.post('/api/v1/auth/forgot-password/verify-otp').send({
-        loginId: '8888888888',
-        otp: otp,
-        newPassword: 'newpassword123',
-      });
+      const resetResponse = await request
+        .post('/api/v1/auth/forgot-password/verify-otp')
+        .send({
+          loginId: '8888888888',
+          otp: otp,
+          newPassword: 'newpassword123',
+        });
 
       expect(resetResponse.status).toBe(200);
 

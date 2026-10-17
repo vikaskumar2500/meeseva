@@ -9,8 +9,14 @@ if (process.env.NODE_ENV === 'test') {
   process.env.JWT_EXPIRES_IN ??= '1d';
 }
 
-const optionalString = z.preprocess((value) => (value === '' ? undefined : value), z.string().optional());
-const optionalEmail = z.preprocess((value) => (value === '' ? undefined : value), z.string().email().optional());
+const optionalString = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().optional()
+);
+const optionalEmail = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().email().optional()
+);
 
 const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(5001),
@@ -20,10 +26,20 @@ const envSchema = z.object({
   MONGODB_AUTH_SOURCE: optionalString,
   JWT_SECRET: z.string().min(16),
   JWT_EXPIRES_IN: z.string().default('1d'),
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  NODE_ENV: z
+    .enum(['development', 'test', 'production'])
+    .default('development'),
   UPLOAD_DIR: z.string().default('uploads'),
-  MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5 * 1024 * 1024),
-  MAX_AUDIO_BYTES: z.coerce.number().int().positive().default(4 * 1024 * 1024),
+  MAX_UPLOAD_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(5 * 1024 * 1024),
+  MAX_AUDIO_BYTES: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(4 * 1024 * 1024),
   GOOGLE_APPLICATION_CREDENTIALS: optionalString,
   GOOGLE_SPEECH_LANGUAGE: z.string().default('en-IN'),
   TWILIO_ACCOUNT_SID: optionalString,

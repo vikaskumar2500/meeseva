@@ -1,7 +1,8 @@
 import { DocumentModel } from './document.model.js';
 import type { Document, DocumentType } from './document.model.js';
+import type { IDocumentRepository } from '../../domain/interfaces/document.repository.interface.js';
 
-export class DocumentRepository {
+export class DocumentRepository implements IDocumentRepository {
   async create(userId: string, data: Omit<Document, 'userId'>) {
     return DocumentModel.create({ ...data, userId });
   }
@@ -46,7 +47,7 @@ export class DocumentRepository {
     return DocumentModel.findByIdAndUpdate(
       id,
       { verificationStatus: status, remarks },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
   }
 
@@ -54,7 +55,7 @@ export class DocumentRepository {
     return DocumentModel.findByIdAndUpdate(
       id,
       { extractedData: data },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
   }
 

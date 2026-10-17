@@ -1,11 +1,6 @@
-API_SPECIFICATION.md
-BACKEND_DESIGN.md
-BACKEND_IMPLEMENTATION_GUIDE.md
-QUICK_REFERENCE.md
-README_BACKEND_DESIGN.md
-START_HERE.md
-
-scripts
-
 node_modules/
+dist/
+.DS_Store
 .pnpm-store
+.env
+.env.local

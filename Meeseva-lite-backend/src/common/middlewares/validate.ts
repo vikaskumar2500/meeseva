@@ -11,7 +11,12 @@ export const validate = (schema: ZodTypeAny): RequestHandler => {
     });
 
     if (!result.success) {
-      next(new AppError(400, result.error.issues.map((issue) => issue.message).join(', ')));
+      next(
+        new AppError(
+          400,
+          result.error.issues.map((issue) => issue.message).join(', ')
+        )
+      );
       return;
     }
 

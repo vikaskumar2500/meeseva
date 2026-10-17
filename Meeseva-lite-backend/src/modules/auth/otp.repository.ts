@@ -1,16 +1,18 @@
 import { OTPModel } from './otp.model.js';
-import { UserModel } from '../users/user.model.js';
+import type {
+  IOtpRepository,
+  CreateOtpInput,
+  VerifyOtpInput,
+} from '../../domain/interfaces/otp.repository.interface.js';
 
-export class OTPRepository {
-  async create(data: {
-    email?: string;
-    phone?: string;
-    code: string;
-    purpose: 'registration' | 'password_reset';
-  }) {
+export class OTPRepository implements IOtpRepository {
+  async create(data: CreateOtpInput) {
     // Delete any existing OTP for this email/phone
     if (data.email) {
-      await OTPModel.deleteMany({ email: data.email, purpose: data.purpose });
+      await OTPModel.deleteMany({
+        email: data.email.toLowerCase(),
+        purpose: data.purpose,
+      });
     }
     if (data.phone) {
       await OTPModel.deleteMany({ phone: data.phone, purpose: data.purpose });
@@ -21,18 +23,14 @@ export class OTPRepository {
 
     return OTPModel.create({
       ...data,
+      email: data.email ? data.email.toLowerCase() : undefined,
       expiresAt,
       attempts: 0,
       verified: false,
     });
   }
 
-  async verify(data: {
-    email?: string;
-    phone?: string;
-    code: string;
-    purpose: 'registration' | 'password_reset';
-  }) {
+  async verify(data: VerifyOtpInput) {
     const query: any = {
       code: data.code,
       purpose: data.purpose,
@@ -40,7 +38,7 @@ export class OTPRepository {
     };
 
     if (data.email) {
-      query.email = data.email;
+      query.email = data.email.toLowerCase();
     } else if (data.phone) {
       query.phone = data.phone;
     }
@@ -80,7 +78,10 @@ export class OTPRepository {
     }).lean();
   }
 
-  async deleteByEmail(email: string, purpose?: 'registration' | 'password_reset') {
+  async deleteByEmail(
+    email: string,
+    purpose?: 'registration' | 'password_reset'
+  ) {
     const query: any = { email: email.toLowerCase() };
     if (purpose) {
       query.purpose = purpose;
@@ -88,7 +89,10 @@ export class OTPRepository {
     return OTPModel.deleteMany(query);
   }
 
-  async deleteByPhone(phone: string, purpose?: 'registration' | 'password_reset') {
+  async deleteByPhone(
+    phone: string,
+    purpose?: 'registration' | 'password_reset'
+  ) {
     const query: any = { phone };
     if (purpose) {
       query.purpose = purpose;

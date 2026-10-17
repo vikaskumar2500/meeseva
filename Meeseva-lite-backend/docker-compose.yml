@@ -4,7 +4,7 @@ services:
     image: mongo:latest
     container_name: ise_mongo
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo-data:/data/db
     networks:
@@ -14,7 +14,7 @@ services:
     build: .
     container_name: ise_api
     ports:
-      - "5000:5000"
+      - '5000:5000'
     depends_on:
       - mongo
     environment:

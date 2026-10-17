@@ -21,7 +21,10 @@ export class UserController {
       if (!request.user) {
         throw new Error('Unauthorized');
       }
-      const user = await this.userService.updateProfile(request.user.id, request.body);
+      const user = await this.userService.updateProfile(
+        request.user.id,
+        request.body
+      );
       response.json({ user });
     } catch (error) {
       next(error);
@@ -55,7 +58,10 @@ export class UserController {
       if (!request.user) {
         throw new Error('Unauthorized');
       }
-      const user = await this.userService.addSavedService(request.user.id, request.body.serviceId);
+      const user = await this.userService.addSavedService(
+        request.user.id,
+        request.body.serviceId
+      );
       response.json({ user });
     } catch (error) {
       next(error);
@@ -70,7 +76,10 @@ export class UserController {
       if (!request.user) {
         throw new Error('Unauthorized');
       }
-      const user = await this.userService.removeSavedService(request.user.id, Number(request.params.serviceId));
+      const user = await this.userService.removeSavedService(
+        request.user.id,
+        Number(request.params.serviceId)
+      );
       response.json({ user });
     } catch (error) {
       next(error);

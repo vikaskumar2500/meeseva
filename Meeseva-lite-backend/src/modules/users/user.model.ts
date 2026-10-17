@@ -1,6 +1,6 @@
 import { Schema, model, type HydratedDocument } from 'mongoose';
 
-export type UserRole = 'citizen' | 'admin';
+export type UserRole = 'citizen' | 'officer' | 'admin';
 
 export interface User {
   desiredLoginId?: string;
@@ -46,9 +46,19 @@ const userSchema = new Schema<User>(
     state: { type: String, trim: true },
     district: { type: String, trim: true },
     pinCode: { type: String, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     passwordHash: { type: String, required: true },
-    role: { type: String, enum: ['citizen', 'admin'], default: 'citizen' },
+    role: {
+      type: String,
+      enum: ['citizen', 'officer', 'admin'],
+      default: 'citizen',
+    },
     aadhaar: { type: String },
     avatar: { type: String },
     otpVerified: { type: Boolean, default: false },
@@ -59,7 +69,7 @@ const userSchema = new Schema<User>(
         name: String,
         issuer: String,
         verified: { type: Boolean, default: false },
-      }
+      },
     ],
     applicationHistory: {
       totalApplications: { type: Number, default: 0 },
@@ -68,12 +78,16 @@ const userSchema = new Schema<User>(
       totalPending: { type: Number, default: 0 },
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 userSchema.set('toJSON', {
   transform: (_document, returnedObject) => {
-    const { passwordHash: _passwordHash, ...safeObject } = returnedObject as unknown as { passwordHash?: string } & Record<string, unknown>;
+    const { passwordHash: _passwordHash, ...safeObject } =
+      returnedObject as unknown as { passwordHash?: string } & Record<
+        string,
+        unknown
+      >;
     return safeObject;
   },
 });

@@ -1,7 +1,8 @@
 import type { User } from './user.model.js';
 import { UserModel } from './user.model.js';
+import type { IUserRepository } from '../../domain/interfaces/user.repository.interface.js';
 
-export class UserRepository {
+export class UserRepository implements IUserRepository {
   async create(user: Partial<User>) {
     return UserModel.create(user);
   }
@@ -33,19 +34,21 @@ export class UserRepository {
     return UserModel.findByIdAndUpdate(
       userId,
       { passwordHash },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
   }
 
   async updateProfile(userId: string, data: Partial<User>) {
-    return UserModel.findByIdAndUpdate(userId, data, { new: true }).lean();
+    return UserModel.findByIdAndUpdate(userId, data, {
+      returnDocument: 'after',
+    }).lean();
   }
 
   async addSavedService(userId: string, serviceId: number) {
     return UserModel.findByIdAndUpdate(
       userId,
       { $addToSet: { savedServices: serviceId } },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
   }
 
@@ -53,12 +56,14 @@ export class UserRepository {
     return UserModel.findByIdAndUpdate(
       userId,
       { $pull: { savedServices: serviceId } },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
   }
 
-  async getSavedServices(userId: string) {
-    const user = await UserModel.findById(userId).select('savedServices').lean();
-    return user?.savedServices || [];
+  async getSavedServices(userId: string): Promise<number[]> {
+    const user = await UserModel.findById(userId)
+      .select('savedServices')
+      .lean();
+    return (user?.savedServices as number[]) || [];
   }
 }

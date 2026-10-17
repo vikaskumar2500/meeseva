@@ -7,7 +7,7 @@ import { UserModel } from '../../modules/users/user.model.js';
 type AuthTokenPayload = {
   sub: string;
   email: string;
-  role: 'citizen' | 'admin';
+  role: 'citizen' | 'officer' | 'admin';
 };
 
 export const requireAuth: RequestHandler = async (request, _response, next) => {
@@ -32,10 +32,28 @@ export const requireAuth: RequestHandler = async (request, _response, next) => {
     request.user = {
       id: decoded.sub,
       email: decoded.email,
-      role: decoded.role,
+      role: decoded.role || 'citizen',
     };
     next();
   } catch {
     next(new AppError(401, 'Unauthorized'));
   }
+};
+
+export const requireRoles = (
+  roles: Array<'citizen' | 'officer' | 'admin'>
+): RequestHandler => {
+  return (request, _response, next) => {
+    if (!request.user) {
+      next(new AppError(401, 'Unauthorized'));
+      return;
+    }
+
+    if (!roles.includes(request.user.role)) {
+      next(new AppError(403, 'Forbidden: Insufficient privileges'));
+      return;
+    }
+
+    next();
+  };
 };
