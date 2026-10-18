@@ -50,3 +50,4 @@ export const SUPPORTED_LOCALES = [
   { code: 'en-IN', name: 'English (Indian)' },
   { code: 'ta-IN', name: 'தமிழ் (Tamil)' },
 ] as const;
+

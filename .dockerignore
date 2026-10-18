@@ -10,3 +10,4 @@ Meeseva-lite-backend/uploads/*
 !Meeseva-lite-backend/uploads/.gitkeep
 Meeseva-lite-frontend/dist
 packages/shared/dist
+

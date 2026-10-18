@@ -37,3 +37,4 @@ COPY --from=builder /app/Meeseva-lite-backend/node_modules ./Meeseva-lite-backen
 EXPOSE 5001
 
 CMD ["node", "Meeseva-lite-backend/dist/server.js"]
+

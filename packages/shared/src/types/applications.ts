@@ -47,3 +47,4 @@ export interface UpdateApplicationStatusDto {
   remarks?: string;
   officerNote?: string;
 }
+

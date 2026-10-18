@@ -60,3 +60,4 @@ export const updateApplicationStatusSchema = z.object({
   ]),
   remarks: z.string().optional(),
 });
+

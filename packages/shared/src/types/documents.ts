@@ -27,3 +27,4 @@ export interface UploadDocumentDto {
   category: DocumentCategory;
   notes?: string;
 }
+
