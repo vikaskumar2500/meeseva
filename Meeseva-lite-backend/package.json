@@ -1,5 +1,5 @@
 {
-  "name": "ise_backend",
+  "name": "@meeseva/backend",
   "version": "1.0.0",
   "description": "Express + TypeScript backend API with JWT auth, MongoDB persistence, application data, and tracking.",
   "packageManager": "pnpm@10.32.1",
@@ -10,6 +10,7 @@
     "seed:services": "tsx src/scripts/seed-services.ts",
     "start": "node dist/server.js",
     "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -22,6 +23,7 @@
   },
   "dependencies": {
     "@google-cloud/speech": "^6.7.1",
+    "@meeseva/shared": "workspace:*",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",

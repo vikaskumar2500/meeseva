@@ -1,17 +1,26 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import process from 'node:process';
 
 console.log('\x1b[36m%s\x1b[0m', '════════════════════════════════════════════════════════════════');
-console.log('\x1b[32m%s\x1b[0m', '  🚀 Starting MeeSeva Lite Enterprise Workspace (Dev Mode)');
+console.log('\x1b[32m%s\x1b[0m', '  🚀 Starting MeeSeva Monorepo Workspace (Dev Mode)');
 console.log('\x1b[36m%s\x1b[0m', '════════════════════════════════════════════════════════════════');
 
-const backend = spawn('pnpm', ['--dir', 'Meeseva-lite-backend', 'dev'], {
+// Ensure shared package is compiled before launching dev services
+console.log('\x1b[33m%s\x1b[0m', '📦 Building @meeseva/shared package...');
+spawnSync('pnpm', ['--filter', '@meeseva/shared', 'build'], {
+  stdio: 'inherit',
+  shell: true,
+});
+
+console.log('\x1b[32m%s\x1b[0m', '🌟 Starting backend and frontend in parallel...');
+
+const backend = spawn('pnpm', ['--filter', '@meeseva/backend', 'dev'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env },
 });
 
-const frontend = spawn('npm', ['--prefix', 'Meeseva-lite-frontend', 'run', 'dev'], {
+const frontend = spawn('pnpm', ['--filter', '@meeseva/frontend', 'dev'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env },
@@ -38,4 +47,3 @@ frontend.on('exit', (code) => {
     console.error(`Frontend process exited with code ${code}`);
   }
 });
-

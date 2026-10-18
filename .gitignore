@@ -1,6 +1,12 @@
 node_modules/
 dist/
+build/
+.turbo/
 .DS_Store
-.pnpm-store
+.pnpm-store/
 .env
 .env.local
+.env.*.local
+*.tsbuildinfo
+coverage/
+*.log

@@ -1,0 +1,39 @@
+# Multi-stage Dockerfile for Meeseva Backend in Monorepo
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+RUN npm install -g pnpm@10.32.1
+
+# Copy monorepo manifests
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json turbo.json ./
+COPY packages/ ./packages/
+COPY Meeseva-lite-backend/package.json ./Meeseva-lite-backend/
+COPY Meeseva-lite-backend/tsconfig.json ./Meeseva-lite-backend/
+
+# Install workspace dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy backend source
+COPY Meeseva-lite-backend/src ./Meeseva-lite-backend/src
+
+# Build shared package and backend
+RUN pnpm --filter @meeseva/shared build && pnpm --filter @meeseva/backend build
+
+# Production runtime stage
+FROM node:22-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=5001
+
+COPY --from=builder /app/package.json /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/packages/ ./packages/
+COPY --from=builder /app/Meeseva-lite-backend/package.json ./Meeseva-lite-backend/
+COPY --from=builder /app/Meeseva-lite-backend/dist ./Meeseva-lite-backend/dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/Meeseva-lite-backend/node_modules ./Meeseva-lite-backend/node_modules
+
+EXPOSE 5001
+
+CMD ["node", "Meeseva-lite-backend/dist/server.js"]

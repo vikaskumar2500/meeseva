@@ -1,5 +1,5 @@
 {
-  "name": "meeseva-lite-frontend",
+  "name": "@meeseva/frontend",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@meeseva/shared": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^1.16.0",
     "react": "^19.0.0",

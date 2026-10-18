@@ -1,0 +1,12 @@
+node_modules
+.git
+.DS_Store
+dist
+coverage
+.turbo
+*.log
+Meeseva-lite-backend/dist
+Meeseva-lite-backend/uploads/*
+!Meeseva-lite-backend/uploads/.gitkeep
+Meeseva-lite-frontend/dist
+packages/shared/dist

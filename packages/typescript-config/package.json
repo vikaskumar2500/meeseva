@@ -1,0 +1,11 @@
+{
+  "name": "@meeseva/typescript-config",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shared TypeScript configurations across Meeseva monorepo",
+  "files": [
+    "base.json",
+    "node.json",
+    "react.json"
+  ]
+}

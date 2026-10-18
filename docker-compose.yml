@@ -1,0 +1,67 @@
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: meeseva-mongodb
+    restart: always
+    ports:
+      - '27017:27017'
+    environment:
+      - MONGO_INITDB_DATABASE=ise2-local
+    volumes:
+      - meeseva-mongo-data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', 'db.adminCommand("ping")']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - meeseva-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: meeseva-backend
+    restart: always
+    ports:
+      - '5001:5001'
+    environment:
+      - NODE_ENV=production
+      - PORT=5001
+      - MONGODB_URI=mongodb://mongodb:27017/ise2-local
+      - JWT_SECRET=meeseva_enterprise_super_secret_jwt_key_2026
+      - JWT_EXPIRES_IN=7d
+      - CORS_ORIGIN=http://localhost:3000,http://localhost:80
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - meeseva-backend-uploads:/app/Meeseva-lite-backend/uploads
+    healthcheck:
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:5001/health']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    networks:
+      - meeseva-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: meeseva-frontend
+    restart: always
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
+    networks:
+      - meeseva-network
+
+volumes:
+  meeseva-mongo-data:
+  meeseva-backend-uploads:
+
+networks:
+  meeseva-network:
+    driver: bridge
