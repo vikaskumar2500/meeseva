@@ -1,12 +1,105 @@
-node_modules/
-dist/
-build/
-.turbo/
+# ==============================================================================
+# MeeSeva Enterprise Monorepo - Git Ignore Configuration
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Operating System Files
+# ------------------------------------------------------------------------------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Thumbs.db:encrypt
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+**/node_modules/
 .pnpm-store/
+**/.pnpm-store/
+package-lock.json
+yarn.lock
+
+# ------------------------------------------------------------------------------
+# Build, Compilation & Distribution Outputs
+# ------------------------------------------------------------------------------
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+*.tsbuildinfo
+**/*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# Monorepo Build Caches
+# ------------------------------------------------------------------------------
+.turbo/
+**/.turbo/
+.eslintcache
+**/.eslintcache
+.stylelintcache
+*.cache
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets
+# ------------------------------------------------------------------------------
 .env
+.env.*
 .env.local
 .env.*.local
-*.tsbuildinfo
-coverage/
+!.env.example
+!.env.test.example
+*.pem
+*.key
+*.cert
+
+# ------------------------------------------------------------------------------
+# Logs & Diagnostic Files
+# ------------------------------------------------------------------------------
 *.log
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------------------------------------------
+# Testing & Coverage
+# ------------------------------------------------------------------------------
+coverage/
+**/coverage/
+.nyc_output/
+test-results/
+
+# ------------------------------------------------------------------------------
+# Uploads, Attachments & Temporary Files
+# ------------------------------------------------------------------------------
+uploads/*
+**/uploads/*
+!**/uploads/.gitkeep
+tmp/
+temp/
+*.tmp
+
+# ------------------------------------------------------------------------------
+# IDE & Code Editor Artifacts
+# ------------------------------------------------------------------------------
+.idea/
+**/.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json

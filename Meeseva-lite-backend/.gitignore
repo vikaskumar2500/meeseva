@@ -1,7 +1,31 @@
-node_modules
-dist
+# Backend-specific ignore rules
+node_modules/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+
+# Environment & Secrets
 .env
-.DS_Store
-coverage
+.env.*
+.env.local
+!.env.example
+!.env.test.example
+
+# Logs & Diagnostics
+*.log
 pnpm-debug.log*
-uploads
+npm-debug.log*
+yarn-debug.log*
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# File uploads and user documents
+uploads/*
+!uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
