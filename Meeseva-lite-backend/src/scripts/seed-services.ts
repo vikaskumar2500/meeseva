@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 import { env } from '../config/env.js';
 import { ServiceModel } from '../modules/services/service.model.js';
+import { UserModel } from '../modules/users/user.model.js';
+import { ApplicationModel } from '../modules/applications/application.model.js';
+import { TrackingModel } from '../modules/tracking/tracking.model.js';
+import { DocumentModel } from '../modules/documents/document.model.js';
 
 const servicesData = [
   {
@@ -266,19 +271,203 @@ async function seed() {
   try {
     console.info('Connecting to MongoDB database:', env.MONGODB_URI);
     await mongoose.connect(env.MONGODB_URI);
-    console.info('Connected. Cleaning existing services collection...');
+
+    // 1. Services Catalog
+    console.info('Cleaning and seeding government services catalog...');
     await ServiceModel.deleteMany({});
-
-    console.info(
-      `Inserting ${servicesData.length} curated citizen services...`
-    );
     await ServiceModel.insertMany(servicesData);
+    console.info(`✓ Seeded ${servicesData.length} services`);
 
-    console.info('Successfully seeded government services catalog!');
+    // 2. Demo Users
+    console.info('Cleaning and seeding demo users...');
+    await UserModel.deleteMany({
+      email: { $in: ['citizen@meeseva.gov.in', 'officer@meeseva.gov.in'] },
+    });
+
+    const citizenPasswordHash = await bcrypt.hash('Citizen@123', 10);
+    const officerPasswordHash = await bcrypt.hash('Officer@123', 10);
+
+    const citizenUser = await UserModel.create({
+      desiredLoginId: 'ramesh.citizen',
+      fullName: 'Ramesh Kumar',
+      email: 'citizen@meeseva.gov.in',
+      phone: '9876543210',
+      passwordHash: citizenPasswordHash,
+      role: 'citizen',
+      otpVerified: true,
+      aadhaar: 'XXXX-XXXX-4321',
+      address: 'Flat 402, Shanti Nilayam, Jubilee Hills',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      pinCode: '500033',
+    });
+
+    const officerUser = await UserModel.create({
+      desiredLoginId: 'lakshmi.officer',
+      fullName: 'Smt. Lakshmi Devi',
+      email: 'officer@meeseva.gov.in',
+      phone: '9876543211',
+      passwordHash: officerPasswordHash,
+      role: 'officer',
+      otpVerified: true,
+      district: 'Hyderabad',
+      state: 'Telangana',
+    });
+    console.info('✓ Seeded demo citizen and officer users');
+
+    // 3. Demo Applications & Tracking History
+    console.info('Cleaning and seeding demo applications and tracking timelines...');
+    await ApplicationModel.deleteMany({ userId: citizenUser._id });
+
+    // App 1: Approved Income Certificate
+    const app1 = await ApplicationModel.create({
+      userId: citizenUser._id,
+      applicationType: 'Income Certificate',
+      title: 'Income Certificate for Education Scholarship',
+      status: 'approved',
+      payload: {
+        applicantName: 'Ramesh Kumar',
+        fatherName: 'Venkat Kumar',
+        annualIncome: 180000,
+        occupation: 'Private Sector Employee',
+        rationCardNumber: 'WAP123456789',
+        purpose: 'Higher Education Scholarship Scheme',
+      },
+    });
+
+    await TrackingModel.create([
+      {
+        applicationId: app1._id,
+        status: 'submitted',
+        note: 'Application submitted online with Aadhaar and Salary certificate.',
+        updatedBy: citizenUser._id,
+      },
+      {
+        applicationId: app1._id,
+        status: 'in_review',
+        note: 'Documents verified and found satisfactory by Village Revenue Officer.',
+        updatedBy: officerUser._id,
+      },
+      {
+        applicationId: app1._id,
+        status: 'approved',
+        note: 'Approved by Tahsildar. Digital Certificate #TG-REV-2026-90412 issued.',
+        updatedBy: officerUser._id,
+      },
+    ]);
+
+    // App 2: Under Review Caste Certificate
+    const app2 = await ApplicationModel.create({
+      userId: citizenUser._id,
+      applicationType: 'Caste & Community Certificate',
+      title: 'OBC Community Certificate Application',
+      status: 'in_review',
+      payload: {
+        applicantName: 'Ramesh Kumar',
+        fatherName: 'Venkat Kumar',
+        casteCategory: 'OBC',
+        subCaste: 'Yadava',
+        purpose: 'Public Examination and State Quota Application',
+      },
+    });
+
+    await TrackingModel.create([
+      {
+        applicationId: app2._id,
+        status: 'submitted',
+        note: 'Application filed online with family school certificates.',
+        updatedBy: citizenUser._id,
+      },
+      {
+        applicationId: app2._id,
+        status: 'in_review',
+        note: 'Under scrutiny at Mandal Revenue Office for community verification.',
+        updatedBy: officerUser._id,
+      },
+    ]);
+
+    // App 3: Newly Submitted Ration Card
+    const app3 = await ApplicationModel.create({
+      userId: citizenUser._id,
+      applicationType: 'Food Security (Ration Card) Application',
+      title: 'New Food Security Card Registration',
+      status: 'submitted',
+      payload: {
+        familyHead: 'Ramesh Kumar',
+        totalMembers: 4,
+        gasConnection: 'Single Cylinder',
+        residenceType: 'Rented',
+      },
+    });
+
+    await TrackingModel.create([
+      {
+        applicationId: app3._id,
+        status: 'submitted',
+        note: 'Online application acknowledgment generated. Pending document queue.',
+        updatedBy: citizenUser._id,
+      },
+    ]);
+    console.info('✓ Seeded 3 applications across submitted, in_review, and approved statuses');
+
+    // 4. Demo Digital Locker Documents
+    console.info('Cleaning and seeding digital document locker...');
+    await DocumentModel.deleteMany({ userId: citizenUser._id });
+
+    await DocumentModel.create([
+      {
+        userId: citizenUser._id,
+        name: 'Aadhaar Card',
+        type: 'aadhaar',
+        issuer: 'UIDAI - Government of India',
+        documentNumber: 'XXXX-XXXX-4321',
+        fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=400&q=80',
+        fileMimetype: 'application/pdf',
+        fileSize: 1048576,
+        verificationStatus: 'verified',
+        remarks: 'Digitally verified against UIDAI vault',
+      },
+      {
+        userId: citizenUser._id,
+        name: 'Salary & Income Proof',
+        type: 'certificate',
+        issuer: 'Revenue Authority / Employer',
+        documentNumber: 'INC-PROOF-2026',
+        fileUrl: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=400&q=80',
+        fileMimetype: 'application/pdf',
+        fileSize: 524288,
+        verificationStatus: 'verified',
+        remarks: 'Validated with Form 16 submission',
+      },
+      {
+        userId: citizenUser._id,
+        name: 'Secondary School Study Certificate',
+        type: 'certificate',
+        issuer: 'State Board of Secondary Education',
+        documentNumber: 'SSC-TG-2018-490',
+        fileUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80',
+        fileMimetype: 'application/pdf',
+        fileSize: 819200,
+        verificationStatus: 'verified',
+        remarks: 'Permanent record matched',
+      },
+    ]);
+    console.info('✓ Seeded 3 verified documents in citizen document locker');
+
+    console.info('\n🎉 Full demo database successfully seeded!');
+    console.info('--------------------------------------------------');
+    console.info('👤 Citizen Login:  citizen@meeseva.gov.in / Citizen@123');
+    console.info('👮 Officer Login:  officer@meeseva.gov.in / Officer@123');
+    console.info('📄 Sample App IDs:');
+    console.info(`   - ${app1._id} (Approved - Income Certificate)`);
+    console.info(`   - ${app2._id} (In Review - Caste Certificate)`);
+    console.info(`   - ${app3._id} (Submitted - Ration Card)`);
+    console.info('--------------------------------------------------\n');
+
     await mongoose.disconnect();
     process.exit(0);
   } catch (error) {
-    console.error('Error seeding services:', error);
+    console.error('Error seeding database:', error);
     process.exit(1);
   }
 }

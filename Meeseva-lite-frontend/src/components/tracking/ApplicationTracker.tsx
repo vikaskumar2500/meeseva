@@ -98,6 +98,10 @@ export const ApplicationTracker: React.FC<ApplicationTrackerProps> = ({ initialA
               {loading ? 'Searching...' : 'Track Application'}
             </button>
           </form>
+
+          <p className="text-[11px] text-slate-400 text-center mt-2">
+            Tip: You can copy your Application ID directly from <span className="font-semibold text-slate-600">My Applications</span> tab.
+          </p>
         </div>
       </div>
 

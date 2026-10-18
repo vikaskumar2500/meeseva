@@ -30,6 +30,24 @@ export const createApp = () => {
     response.json({ status: 'ok' });
   });
 
+  app.get('/', (_request, response) => {
+    response.json({
+      name: 'MeeSeva Citizen Services API',
+      version: '1.0.0',
+      status: 'operational',
+      endpoints: {
+        health: '/health',
+        services: '/api/v1/services',
+        categories: '/api/v1/services/categories',
+        auth: '/api/v1/auth',
+        applications: '/api/v1/applications',
+        tracking: '/api/v1/tracking',
+        documents: '/api/v1/documents',
+        speech: '/api/v1/speech',
+      },
+    });
+  });
+
   app.use('/api/v1/auth', authRoutes);
   app.use('/api/v1/users', userRoutes);
   app.use('/api/v1/applications', applicationRoutes);

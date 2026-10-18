@@ -222,6 +222,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* TAB 1: LOGIN */}
           {tab === 'login' && (
             <form onSubmit={handleLogin} className="space-y-4">
+              {/* Quick Demo Login Fillers */}
+              <div className="bg-slate-50 border border-slate-200/80 rounded-lg p-2.5">
+                <span className="block text-[10px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
+                  ⚡ Quick Demo Access
+                </span>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginId('citizen@meeseva.gov.in');
+                      setPassword('Citizen@123');
+                    }}
+                    className="text-left px-2.5 py-1.5 rounded bg-white hover:bg-slate-50 border border-slate-200 hover:border-gov-blue text-xs transition group shadow-2xs"
+                  >
+                    <span className="font-semibold text-slate-800 group-hover:text-gov-blue block">Citizen Demo</span>
+                    <span className="text-[10px] text-slate-400 block truncate">Ramesh Kumar</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLoginId('officer@meeseva.gov.in');
+                      setPassword('Officer@123');
+                    }}
+                    className="text-left px-2.5 py-1.5 rounded bg-white hover:bg-slate-50 border border-slate-200 hover:border-gov-blue text-xs transition group shadow-2xs"
+                  >
+                    <span className="font-semibold text-slate-800 group-hover:text-gov-blue block">Officer Demo</span>
+                    <span className="text-[10px] text-slate-400 block truncate">Smt. Lakshmi Devi</span>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Mobile Number or Email
