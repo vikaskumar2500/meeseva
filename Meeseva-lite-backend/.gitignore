@@ -29,3 +29,16 @@ uploads/*
 # OS files
 .DS_Store
 Thumbs.db
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# File uploads and user documents
+uploads/*
+!uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+

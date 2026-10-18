@@ -103,3 +103,30 @@ temp/
 .vscode/*
 !.vscode/settings.json
 !.vscode/extensions.json
+**/coverage/
+.nyc_output/
+test-results/
+
+# ------------------------------------------------------------------------------
+# Uploads, Attachments & Temporary Files
+# ------------------------------------------------------------------------------
+uploads/*
+**/uploads/*
+!**/uploads/.gitkeep
+tmp/
+temp/
+*.tmp
+
+# ------------------------------------------------------------------------------
+# IDE & Code Editor Artifacts
+# ------------------------------------------------------------------------------
+.idea/
+**/.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
